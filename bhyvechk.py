@@ -118,6 +118,9 @@ rdmsr.p = re.compile(r'((0x[0-9a-f]+): )?(.*)') # I think we've already handled 
 
 #############################
 
+print (cs("bhyvechk - version: " + os.popen("git log --pretty=format:'%h' -n 1").read() + "\n\n", "blue"))
+
+
 if not msrLoaded():
   print(cs("Error - fix me to output msr aoutput", "red"))
   exit(0)
