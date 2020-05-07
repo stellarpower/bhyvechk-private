@@ -16,7 +16,9 @@
 
 # Work in progress - only works for Intel CPUs
 
-import subprocess, re, sys, csv
+import subprocess, re, sys, csv, platform, os
+
+PLATFORM = platform.system()
 
 
 from csv_schema.structure.base import BaseCsvStructure
@@ -64,11 +66,15 @@ def addTableRow(test, name, intel, amd, kvmRequired, bhyveRequired):
   pass
 
 def msrLoaded():
-    # linux:
-    #    `lsmod | grep msr`
-    # solaris:
-    #    - not needed?
-    return True # check the MSR module is loaded
+    if PLATFORM == "Linux":
+        return os.WEXITSTATUS(os.system("lsmod | grep -i msr")) == 0
+    elif PLATFORM == "SunOS":
+        # Fixme - not sure if a kernel module is required, however, only newer illumos has the rdmsr utility
+        return os.WEXITSTATUS(os.system("command -v rdmsr")) == 0
+    print(cs("Warning: platform-specific detection of availability of `rdmsr` utility not available for htis OS", "magenta"))
+    return True #Fallback as above is only a warn, we'll try and have a catch-all later (TODO)
+
+
 
 # TODO: Arguably it would be more portable to wrap the C library call to be accessible form Python
 # using one of the vaerious methods, because the output from rdmsr differs from system to system.
@@ -83,19 +89,31 @@ def msrLoaded():
 # An alternative todo would be to expand illumos-gate's `rdmsr` to output the information in a common
 # format between the major unixen - for example, implement the `-c` switch used on Linux
 def rdmsr(msr, errorMessage = "PLACEHOLDER"):
-    RDMSR = '/usr/sbin/rdmsr'
-    #ESCALATE = '/usr/sbin/rdmsr' # "sudo" #pfexec
-    # ESCALATE
-    ret = subprocess.run([ RDMSR, '-x', msr], stdout=subprocess.PIPE, stderr=subprocess.PIPE)#, capture_output=True)
+    if PLATFORM == "Linux":
+        command = [ "/usr/sbin/rdmsr", "-x"] #["sudo", "/usr/sbin/rdmsr", "-x"]
+    elif PLATFORM == "SunOS":
+        command = ["pfexec", "rdmsr"]
+    else: #Fallback - attempt lowest common denominator
+        command = ["sudo", "rdmsr", "-x"]
+
+    ret = subprocess.run(command + [msr], stdout=subprocess.PIPE, stderr=subprocess.PIPE)#, capture_output=True)
     if ret.returncode != 0:
-        print("Failed to check for %s : %s returned %d:\n%s" % (errorMessage, RDMSR, ret.returncode, ret.stdout.decode()))
+        print("Failed to check for %s : %s returned %d:\n%s" % (errorMessage, command, ret.returncode, ret.stdout.decode()))
+        # fixme: collect the errors instead and output later
     else:
         m = rdmsr.p.match(ret.stdout.decode())
         if m:
-            return int(m.group(0), 16)
-                              #2), 16)
-    return 0
-rdmsr.p = re.compile(r'((0x[0-9a-f]+): )?(.*)')
+            if PLATFORM == "Linux":
+                return int(m.group(0), 16) # FIXME!!
+            elif PLATFORM == "SunOS":
+                return int(m.group(3), 16)
+        return 0 # Throw an exception instead - we shouldn't really get here
+
+rdmsr.p = re.compile(r'((0x[0-9a-f]+): )?(.*)') # I think we've already handled this in the regexp:
+#if PLATFORM == "SunOS":
+#    rdmsr.p = re.compile(r'((0x[0-9a-f]+): )?(.*)')
+#elif PLATFORM == "Linux":
+#    rdmsr.p = re.compile(r'((0x[0-9a-f]+): )?(.*)')
 
 
 #############################
@@ -192,7 +210,7 @@ for row in testRows:
         row['RESULT'] = row['RESULT'] and bool(registerValue & 1 << int(flags[row['Flag 2 id']]['FLAG BIT POSITION']))
                                            #2 ** int(flags[row['Flag 2 id']]['FLAG BIT POSITION']))
 
-print(tabulate.tabulate(testRows))
+print(tabulate.tabulate(testRows, headers = "keys"))
 
 
     # if row['flag id'] != "":
