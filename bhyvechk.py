@@ -98,8 +98,10 @@ def rdmsr(msr, errorMessage = "PLACEHOLDER"):
 
     ret = subprocess.run(command + [msr], stdout=subprocess.PIPE, stderr=subprocess.PIPE)#, capture_output=True)
     if ret.returncode != 0:
-        print("Failed to check for %s : %s returned %d:\n%s" % (errorMessage, command, ret.returncode, ret.stdout.decode()))
+        print("Failed to check for %s : %s returned %d:\n%s" % (errorMessage, command + [msr], ret.returncode, ret.stdout.decode()))
         # fixme: collect the errors instead and output later
+        # fixme :some of these features aren't provided by te CPU,so we ge ta file not found
+        return 0
     else:
         m = rdmsr.p.match(ret.stdout.decode())
         if m:
