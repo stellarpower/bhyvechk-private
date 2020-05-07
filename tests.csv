@@ -1,0 +1,11 @@
+Test ID,Friendly Name,Constant Name,DEPENDS ON ,rdsmr id,flag id,Flag 2 id,pull in if intel or amd elsewhere,,bhyve essential,kvm essential
+1,VMX support enabled in BIOS,,,BIOS_ENABLED,VMX_ENABLED,LOCK,,,,
+2,VMX supports INS/OUTS,,,BASIC,INS_OUTS,,,,,
+3,“True Comntrols”,,,BASIC,CTRLS,,,,,
+4,Has second controls (for true controls),,,TRUE_CTLS,2ND_CTRLS,,,,,
+5,Has second controls (for proc-based controls),,,CTLS,2ND_CTRLS,,,,,
+6,Supports EPT,,,CTLS2,2_EPT,,,,n,
+7,supports (any) INVEPT,,,VPID_CAP,EPT,,,,n,
+8,Supports single INVEPT,,,VPID_CAP,EPT_SINGLE,,,,n,
+9,Supports all INVEPT,,,VPID_CAP,EPT_ALL,,,,n,
+10,Supports VPID,,,CTLS2,2_VPID,,,,n,
