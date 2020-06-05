@@ -124,7 +124,7 @@ print (cs("bhyvechk - version: " + os.popen("git log --pretty=format:'%h' -n 1")
 
 
 if not msrLoaded():
-  print(cs("Error - fix me to output msr aoutput", "red"))
+  print(cs("Error - msr kernel module not loaded, "red"))
   exit(0)
 
 CSV_DIRECTORY = "."
