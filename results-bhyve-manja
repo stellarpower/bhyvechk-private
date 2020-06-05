@@ -1,0 +1,20 @@
+bhyvechk - version: 7b9cfda
+
+
+msr                    16384  0
+Failed to check for PLACEHOLDER : ['sudo', 'rdmsr', '-x', '0x48e'] returned 4:
+
+Failed to check for PLACEHOLDER : ['sudo', 'rdmsr', '-x', '0x48c'] returned 4:
+
+  Test ID  Friendly Name                                  Constant Name    DEPENDS ON     rdsmr id      flag id      Flag 2 id    pull in if intel or amd elsewhere        bhyve essential    kvm essential    RESULT
+---------  ---------------------------------------------  ---------------  -------------  ------------  -----------  -----------  -----------------------------------  --  -----------------  ---------------  --------
+        1  VMX support enabled in BIOS                                                    BIOS_ENABLED  VMX_ENABLED  LOCK                                                                                      True
+        2  VMX supports INS/OUTS                                                          BASIC         INS_OUTS                                                                                               True
+        3  “True Comntrols”                                                               BASIC         CTRLS                                                                                                  False
+        4  Has second controls (for true controls)                                        TRUE_CTLS     2ND_CTRLS                                                                                              False
+        5  Has second controls (for proc-based controls)                                  CTLS          2ND_CTRLS                                                                                              True
+        6  Supports EPT                                                                   CTLS2         2_EPT                                                              n                                   False
+        7  supports (any) INVEPT                                                          VPID_CAP      EPT                                                                n                                   False
+        8  Supports single INVEPT                                                         VPID_CAP      EPT_SINGLE                                                         n                                   False
+        9  Supports all INVEPT                                                            VPID_CAP      EPT_ALL                                                            n                                   False
+       10  Supports VPID                                                                  CTLS2         2_VPID                                                             n                                   False
