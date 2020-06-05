@@ -90,7 +90,8 @@ def msrLoaded():
 # format between the major unixen - for example, implement the `-c` switch used on Linux
 def rdmsr(msr, errorMessage = "PLACEHOLDER"):
     if PLATFORM == "Linux":
-        command = [ "/usr/sbin/rdmsr", "-x"] #["sudo", "/usr/sbin/rdmsr", "-x"]
+        #command = [ "/usr/sbin/rdmsr", "-x"] #["sudo", "/usr/sbin/rdmsr", "-x"]
+        command = ["sudo", "rdmsr", "-x"]
     elif PLATFORM == "SunOS":
         command = ["pfexec", "rdmsr"]
     else: #Fallback - attempt lowest common denominator
@@ -124,7 +125,7 @@ print (cs("bhyvechk - version: " + os.popen("git log --pretty=format:'%h' -n 1")
 
 
 if not msrLoaded():
-  print(cs("Error - msr kernel module not loaded, "red"))
+  print(cs("Error - msr kernel module not loaded", "red"))
   exit(0)
 
 CSV_DIRECTORY = "."
